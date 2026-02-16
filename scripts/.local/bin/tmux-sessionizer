@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Directories to search for projects
-search_dirs=(~/dev ~/git)
+search_dirs=(~/dev ~/git ~/personal)
 
 if [[ $# -eq 1 ]]; then
     selected=$1
