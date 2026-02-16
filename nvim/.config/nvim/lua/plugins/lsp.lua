@@ -108,6 +108,9 @@ return {
 						},
 					},
 				},
+			snip_ls = {
+				cmd = { "snip-ls", "-diagnostics" },
+			},
 			}
 
 			for server, config in pairs(servers) do
