@@ -108,13 +108,19 @@ return {
                 marksman = {},
                 helm_ls = {},
                 gopls = {
-                    cmd = { "gopls", "-remote=auto", "-logfile=/tmp/gopls.log", "-v", "-rpc.trace" },
+                    cmd = { "gopls", "-remote=auto" },
                     settings = {
                         gopls = {
                             directoryFilters = {
                                 "-internal/api/clients",
                                 "-internal/tests/helpers",
+                                "-**/gen",
+                                "-**/generated",
+                                "-**/proto",
+                                "-**/pb",
+                                "-**/tests",
                             },
+                            buildFlags = { "-tags=manual" },
                         },
                     },
                 },
