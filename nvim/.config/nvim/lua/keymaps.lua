@@ -1,6 +1,10 @@
 local map = vim.keymap.set
 
-map("n", "<leader>o", ":update<CR> :source<CR>", { desc = "Save and source" })
+map("n", "<leader>o", function()
+	package.loaded["options"] = nil
+	package.loaded["keymaps"] = nil
+	vim.cmd("update | source $MYVIMRC")
+end, { desc = "Save and reload config" })
 map("n", "<leader>pv", ":Ex<CR>", { desc = "Open file explorer" })
 
 -- Window resize
@@ -29,3 +33,6 @@ map("x", "<leader>p", '"_dP', { desc = "Paste without yank" })
 
 -- Clear search highlight
 map("n", "<Esc>", ":noh<CR>", { silent = true })
+
+-- Disable F1 help
+map({ "n", "i", "v" }, "<F1>", "<Nop>")
