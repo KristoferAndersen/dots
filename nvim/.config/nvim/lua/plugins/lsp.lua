@@ -4,12 +4,12 @@ return {
     -- vim.lsp.config/enable pick up its server definitions automatically
     {
         "neovim/nvim-lspconfig",
-        lazy = false,
+        lazy = true,
     },
 
     {
         "williamboman/mason.nvim",
-        lazy = false,
+        lazy = true,
         config = function()
             require("mason").setup()
         end,
@@ -17,7 +17,7 @@ return {
 
     {
         "j-hui/fidget.nvim",
-        lazy = false,
+        event = "LspAttach",
         config = function()
             require("fidget").setup()
         end,
@@ -32,27 +32,8 @@ return {
             "b0o/SchemaStore.nvim",
             "j-hui/fidget.nvim",
         },
-        lazy = false,
+        event = { "BufReadPre", "BufNewFile" },
         config = function()
-            require("mason-lspconfig").setup({
-                ensure_installed = {
-                    "lua_ls",
-                    "pyright",
-                    "ruff",
-                    "jdtls",
-                    "jsonls",
-                    "bashls",
-                    "ts_ls",
-                    "angularls",
-                    "marksman",
-                    "helm_ls",
-                    "gopls",
-                    "yamlls",
-                    "cssls",
-                },
-                automatic_installation = false,
-            })
-
             vim.diagnostic.config({
                 virtual_text = true,
                 signs = true,
@@ -80,6 +61,25 @@ return {
             })
 
             local capabilities = require("blink.cmp").get_lsp_capabilities()
+
+            -- Kill the shared gopls daemon (-remote=auto) and restart the
+            -- client. Use after branch switches or when gopls state goes
+            -- stale (the daemon caches build flags from the first client).
+            vim.api.nvim_create_user_command("GoplsRestart", function()
+                vim.fn.jobstart({ "pkill", "-f", "gopls" })
+                vim.defer_fn(function()
+                    vim.cmd("LspRestart gopls")
+                end, 200)
+            end, { desc = "Kill gopls daemon and restart" })
+
+            -- Editor module resolution for gopls:
+            --   host (full auth): "mod" -> resolve from the module cache and
+            --     ignore vendor/, so vendor drift never breaks gopls and you
+            --     don't re-vendor mid-edit.
+            --   air-gapped container (private deps only in vendor/): export
+            --     GOPLS_MOD=vendor so gopls can still resolve private imports.
+            -- Real builds/CI use vendor regardless (go defaults to -mod=vendor).
+            local go_mod = vim.env.GOPLS_MOD or "mod"
 
             local servers = {
                 lua_ls = {
@@ -120,7 +120,7 @@ return {
                                 "-**/pb",
                                 "-**/tests",
                             },
-                            buildFlags = { "-tags=manual" },
+                            buildFlags = { "-tags=manual", "-mod=" .. go_mod },
                         },
                     },
                 },
@@ -137,6 +137,14 @@ return {
                     cmd = { "snip-ls", "-diagnostics" },
                 },
             }
+
+            local mason_ensure = vim.tbl_filter(function(name)
+                return name ~= "snip_ls"
+            end, vim.tbl_keys(servers))
+            require("mason-lspconfig").setup({
+                ensure_installed = mason_ensure,
+                automatic_enable = false,
+            })
 
             for server, config in pairs(servers) do
                 config.capabilities = capabilities

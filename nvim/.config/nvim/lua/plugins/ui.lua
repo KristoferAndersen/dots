@@ -1,7 +1,7 @@
 return {
   {
     "echasnovski/mini.icons",
-    lazy = false,
+    event = "VeryLazy",
     opts = {},
   },
 

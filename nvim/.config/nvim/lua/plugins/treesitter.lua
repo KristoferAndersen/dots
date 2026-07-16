@@ -3,7 +3,7 @@ return {
 		"nvim-treesitter/nvim-treesitter",
 		branch = "main",
 		build = ":TSUpdate",
-		lazy = false,
+		event = { "BufReadPost", "BufNewFile" },
 		config = function()
 			require("nvim-treesitter").setup()
 			vim.api.nvim_create_autocmd("FileType", {
@@ -49,37 +49,42 @@ return {
 		"nvim-treesitter/nvim-treesitter-textobjects",
 		branch = "main",
 		dependencies = { "nvim-treesitter/nvim-treesitter" },
-		lazy = false,
+		event = { "BufReadPost", "BufNewFile" },
 		config = function()
 			require("nvim-treesitter-textobjects").setup({
-				select = {
-					enable = true,
-					lookahead = true,
-					keymaps = {
-						["af"] = "@function.outer",
-						["if"] = "@function.inner",
-						["ac"] = "@class.outer",
-						["ic"] = "@class.inner",
-						["aa"] = "@parameter.outer",
-						["ia"] = "@parameter.inner",
-					},
-				},
-				move = {
-					enable = true,
-					goto_next_start = {
-						["]f"] = "@function.outer",
-						["]c"] = "@class.outer",
-						["]a"] = "@parameter.inner",
-					},
-					goto_next_end = { ["]F"] = "@function.outer", ["]C"] = "@class.outer" },
-					goto_previous_start = {
-						["[f"] = "@function.outer",
-						["[c"] = "@class.outer",
-						["[a"] = "@parameter.inner",
-					},
-					goto_previous_end = { ["[F"] = "@function.outer", ["[C"] = "@class.outer" },
-				},
+				select = { lookahead = true },
+				move = { set_jumps = true },
 			})
+
+			local ts_select = require("nvim-treesitter-textobjects.select")
+			local selects = {
+				["af"] = "@function.outer",
+				["if"] = "@function.inner",
+				["ac"] = "@class.outer",
+				["ic"] = "@class.inner",
+				["aa"] = "@parameter.outer",
+				["ia"] = "@parameter.inner",
+			}
+			for lhs, obj in pairs(selects) do
+				vim.keymap.set({ "x", "o" }, lhs, function()
+					ts_select.select_textobject(obj, "textobjects")
+				end, { desc = "Select " .. obj })
+			end
+
+			local ts_move = require("nvim-treesitter-textobjects.move")
+			local moves = {
+				goto_next_start = { ["]f"] = "@function.outer", ["]c"] = "@class.outer", ["]a"] = "@parameter.inner" },
+				goto_next_end = { ["]F"] = "@function.outer", ["]C"] = "@class.outer" },
+				goto_previous_start = { ["[f"] = "@function.outer", ["[c"] = "@class.outer", ["[a"] = "@parameter.inner" },
+				goto_previous_end = { ["[F"] = "@function.outer", ["[C"] = "@class.outer" },
+			}
+			for fn, maps in pairs(moves) do
+				for lhs, obj in pairs(maps) do
+					vim.keymap.set({ "n", "x", "o" }, lhs, function()
+						ts_move[fn](obj, "textobjects")
+					end, { desc = obj })
+				end
+			end
 		end,
 	},
 }

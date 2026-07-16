@@ -36,3 +36,6 @@ map("n", "<Esc>", ":noh<CR>", { silent = true })
 
 -- Disable F1 help
 map({ "n", "i", "v" }, "<F1>", "<Nop>")
+
+-- Common typos
+vim.api.nvim_create_user_command("W", "w", {})

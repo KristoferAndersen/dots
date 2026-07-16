@@ -2,7 +2,7 @@ return {
 	{
 		"stevearc/oil.nvim",
 		dependencies = { "echasnovski/mini.icons" },
-		lazy = false,
+		cmd = "Oil",
 		opts = {
 			view_options = {
 				show_hidden = true,

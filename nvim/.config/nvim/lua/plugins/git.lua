@@ -21,4 +21,10 @@ return {
       end,
     },
   },
+
+  -- Git commands (:Git, blame, diff)
+  {
+    "tpope/vim-fugitive",
+    cmd = { "Git", "G" },
+  },
 }
