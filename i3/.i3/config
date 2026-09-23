@@ -5,7 +5,7 @@
 set $mod Mod4
 
 # Fast key repeat (200ms delay, 50 keys/sec)
-exec --no-startup-id xset r rate 200 50
+exec_always --no-startup-id xset r rate 200 50
 
 # set default desktop layout (default is tiling)
 # workspace_layout tabbed <stacking|tabbed>
