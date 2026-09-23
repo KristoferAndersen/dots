@@ -73,13 +73,14 @@ return {
             end, { desc = "Kill gopls daemon and restart" })
 
             -- Editor module resolution for gopls:
-            --   host (full auth): "mod" -> resolve from the module cache and
-            --     ignore vendor/, so vendor drift never breaks gopls and you
-            --     don't re-vendor mid-edit.
+            --   default "readonly" -> resolve from the module cache and ignore
+            --     vendor/ (so vendor drift never breaks gopls), but never let
+            --     gopls write go.mod/go.sum. Run `go mod tidy` yourself.
             --   air-gapped container (private deps only in vendor/): export
             --     GOPLS_MOD=vendor so gopls can still resolve private imports.
+            --   GOPLS_MOD=mod re-enables auto-editing of go.mod if you want it.
             -- Real builds/CI use vendor regardless (go defaults to -mod=vendor).
-            local go_mod = vim.env.GOPLS_MOD or "mod"
+            local go_mod = vim.env.GOPLS_MOD or "readonly"
 
             local servers = {
                 lua_ls = {
