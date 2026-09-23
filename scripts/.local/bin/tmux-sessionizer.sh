@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Directories to search for projects
-search_dirs=(~/dev/work ~/dev/personal)
+search_dirs=${SESSIONIZER_SEARCH_DIRS:=(~/dev/work ~/dev/personal)}
 
 if [[ $# -eq 1 ]]; then
     selected=$1
