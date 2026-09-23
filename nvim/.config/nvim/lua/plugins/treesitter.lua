@@ -3,6 +3,7 @@ return {
 		"nvim-treesitter/nvim-treesitter",
 		branch = "main",
 		build = ":TSUpdate",
+		dependencies = { "williamboman/mason.nvim" },
 		event = { "BufReadPost", "BufNewFile" },
 		config = function()
 			require("nvim-treesitter").setup()
@@ -35,13 +36,37 @@ return {
 				"vimdoc",
 				"yaml",
 			}
-			local installed = require("nvim-treesitter.config").get_installed()
-			local to_install = vim.tbl_filter(function(lang)
-				return not vim.tbl_contains(installed, lang)
-			end, ensure)
-			if #to_install > 0 then
-				require("nvim-treesitter.install").install(to_install)
+			local function install_missing()
+				local installed = require("nvim-treesitter.config").get_installed()
+				local to_install = vim.tbl_filter(function(lang)
+					return not vim.tbl_contains(installed, lang)
+				end, ensure)
+				if #to_install > 0 then
+					require("nvim-treesitter.install").install(to_install)
+				end
 			end
+
+			-- Parsers compile via the tree-sitter CLI, which mason provides.
+			-- Pinned: >= 0.26 needs glibc 2.39; the Debian 12 devcontainer has 2.36.
+			local cli_version = "v0.25.10"
+			require("mason")
+			local registry = require("mason-registry")
+			registry.refresh(function()
+				local pkg = registry.get_package("tree-sitter-cli")
+				if pkg:get_installed_version() == cli_version then
+					install_missing()
+					return
+				end
+				pkg:once("install:success", function()
+					vim.schedule(install_missing)
+				end)
+				pkg:once("install:failed", function()
+					vim.schedule(function()
+						vim.notify("mason: tree-sitter-cli install failed; run :TSUpdate after fixing", vim.log.levels.WARN)
+					end)
+				end)
+				pkg:install({ version = cli_version })
+			end)
 		end,
 	},
 
