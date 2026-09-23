@@ -18,6 +18,7 @@ return {
             { "<leader>fw", "<cmd>Telescope lsp_dynamic_workspace_symbols<cr>", desc = "Workspace symbols" },
             { "<leader>fc", "<cmd>Telescope grep_string<cr>",               desc = "Grep word under cursor" },
             { "<leader>/",  "<cmd>Telescope current_buffer_fuzzy_find<cr>", desc = "Fuzzy find in buffer" },
+            { "<leader>fp", "<cmd>Telescope colorscheme enable_preview=true<cr>", desc = "Colorschemes (live preview)" },
         },
         config = function()
             local telescope = require("telescope")

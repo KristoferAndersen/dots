@@ -1,14 +1,18 @@
 return {
+  -- Active theme
   {
-    "folke/tokyonight.nvim",
+    "rebelot/kanagawa.nvim",
     lazy = false,
     priority = 1000,
-    opts = {
-      style = "moon",
-    },
+    opts = {},
     config = function(_, opts)
-      require("tokyonight").setup(opts)
-      vim.cmd.colorscheme("tokyonight")
+      require("kanagawa").setup(opts)
+      vim.cmd.colorscheme("kanagawa")
     end,
   },
+
+  -- Alternates: lazy-loaded on demand when picked via <leader>fp / :colorscheme
+  { "catppuccin/nvim", name = "catppuccin", lazy = true },
+  { "rose-pine/neovim", name = "rose-pine", lazy = true },
+  { "folke/tokyonight.nvim", lazy = true },
 }
