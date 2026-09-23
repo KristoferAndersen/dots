@@ -57,7 +57,7 @@ return {
             telescope.setup({
                 defaults = {
                     vimgrep_arguments = vimgrep_arguments,
-                    path_display = { "smart" },
+                    path_display = { "filename_first" },
                 },
                 pickers = {
                     find_files = { find_command = find_command },
