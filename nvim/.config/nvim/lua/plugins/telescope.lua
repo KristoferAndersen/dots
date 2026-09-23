@@ -26,6 +26,7 @@ return {
             -- of file_ignore_patterns, which runs Lua matches on every result.
             local excludes = {
                 ".git",
+                ".worktrees",
                 "node_modules",
                 "target",
                 "build",

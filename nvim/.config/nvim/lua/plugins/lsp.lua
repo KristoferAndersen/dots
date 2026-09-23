@@ -82,6 +82,22 @@ return {
             -- Real builds/CI use vendor regardless (go defaults to -mod=vendor).
             local go_mod = vim.env.GOPLS_MOD or "readonly"
 
+            local go_dir_filters = {
+                "-**/.worktrees",
+                "-internal/api/clients",
+                "-internal/tests/helpers",
+                "-**/gen",
+                "-**/generated",
+                "-**/proto",
+                "-**/pb",
+                "-**/tests",
+            }
+            -- Outside vendor mode gopls resolves from the module cache, so
+            -- vendor/ is dead weight for scanning/watching — skip it.
+            if go_mod ~= "vendor" then
+                table.insert(go_dir_filters, "-**/vendor")
+            end
+
             local servers = {
                 lua_ls = {
                     settings = {
@@ -109,18 +125,12 @@ return {
                 marksman = {},
                 helm_ls = {},
                 gopls = {
-                    cmd = { "gopls", "-remote=auto" },
+                    -- timeout=0: the auto-started daemon stays alive after the
+                    -- last editor detaches, keeping the metadata graph warm.
+                    cmd = { "gopls", "-remote=auto", "-remote.listen.timeout=0" },
                     settings = {
                         gopls = {
-                            directoryFilters = {
-                                "-internal/api/clients",
-                                "-internal/tests/helpers",
-                                "-**/gen",
-                                "-**/generated",
-                                "-**/proto",
-                                "-**/pb",
-                                "-**/tests",
-                            },
+                            directoryFilters = go_dir_filters,
                             buildFlags = { "-tags=manual", "-mod=" .. go_mod },
                             symbolMatcher = "fastFuzzy",
                         },
