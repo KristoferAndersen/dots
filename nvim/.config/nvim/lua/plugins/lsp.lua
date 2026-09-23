@@ -122,6 +122,7 @@ return {
                                 "-**/tests",
                             },
                             buildFlags = { "-tags=manual", "-mod=" .. go_mod },
+                            symbolMatcher = "fastFuzzy",
                         },
                     },
                 },

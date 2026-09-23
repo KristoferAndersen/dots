@@ -15,7 +15,7 @@ return {
             { "<leader>fr", "<cmd>Telescope oldfiles<cr>",                  desc = "Recent files" },
             { "<leader>fd", "<cmd>Telescope diagnostics<cr>",               desc = "Diagnostics" },
             { "<leader>fs", "<cmd>Telescope lsp_document_symbols<cr>",      desc = "Document symbols" },
-            { "<leader>fw", "<cmd>Telescope lsp_workspace_symbols<cr>",     desc = "Workspace symbols" },
+            { "<leader>fw", "<cmd>Telescope lsp_dynamic_workspace_symbols<cr>", desc = "Workspace symbols" },
             { "<leader>fc", "<cmd>Telescope grep_string<cr>",               desc = "Grep word under cursor" },
             { "<leader>/",  "<cmd>Telescope current_buffer_fuzzy_find<cr>", desc = "Fuzzy find in buffer" },
         },
