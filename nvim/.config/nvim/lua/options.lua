@@ -33,3 +33,19 @@ opt.clipboard = "unnamedplus"
 opt.mouse = "a"
 opt.updatetime = 250
 opt.timeoutlen = 300
+
+-- Auto-reload buffers edited outside nvim (e.g. Claude Code in another pane).
+-- FocusGained needs `set -g focus-events on` in tmux.
+opt.autoread = true
+vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold" }, {
+	callback = function()
+		if vim.fn.getcmdwintype() == "" and vim.fn.mode() ~= "c" then
+			vim.cmd("checktime")
+		end
+	end,
+})
+vim.api.nvim_create_autocmd("FileChangedShellPost", {
+	callback = function()
+		vim.notify("File changed on disk, buffer reloaded", vim.log.levels.INFO)
+	end,
+})
