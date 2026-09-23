@@ -21,21 +21,46 @@ return {
         },
         config = function()
             local telescope = require("telescope")
+
+            -- Exclusions live in fd/rg (native, gitignore-style globs) instead
+            -- of file_ignore_patterns, which runs Lua matches on every result.
+            local excludes = {
+                ".git",
+                "node_modules",
+                "target",
+                "build",
+                "gen",
+                "generated",
+                "pb",
+                "tests",
+                "mock",
+                "mocks",
+                "internal/api/clients",
+                "*.pb.go",
+                "*.pb.gw.go",
+                "*.pb.validate.go",
+                "*.swagger.json",
+                "*_mock.go",
+            }
+
+            local fd = vim.fn.executable("fd") == 1 and "fd" or "fdfind"
+            local find_command = { fd, "--type", "f", "--hidden" }
+            local vimgrep_arguments = {
+                "rg", "--color=never", "--no-heading", "--with-filename",
+                "--line-number", "--column", "--smart-case", "--hidden",
+            }
+            for _, pattern in ipairs(excludes) do
+                vim.list_extend(find_command, { "--exclude", pattern })
+                vim.list_extend(vimgrep_arguments, { "--glob", "!" .. pattern })
+            end
+
             telescope.setup({
                 defaults = {
-                    file_ignore_patterns = {
-                        "node_modules", ".git/", "target/", "build/",
-                        "%.pb%.go$", "%.pb%.gw%.go$", "%.pb%.validate%.go$",
-                        "%.swagger%.json$",
-                        "/gen/", "/generated/", "/pb/", "/tests/",
-                        "internal/api/clients/",
-                        "/mocks?/", "_mock%.go$",
-                    },
+                    vimgrep_arguments = vimgrep_arguments,
                     path_display = { "smart" },
                 },
                 pickers = {
-                    find_files = { hidden = true },
-                    live_grep = { additional_args = { "--hidden" } },
+                    find_files = { find_command = find_command },
                     buffers = { theme = "dropdown", previewer = false, sort_mru = true },
                 },
             })
